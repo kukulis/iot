@@ -1,14 +1,13 @@
 package util
 
 import (
-	"fmt"
-	"strconv"
+	"encoding/hex"
 )
 
-func Hex2Bin(hex string) (string, error) {
-	ui, err := strconv.ParseUint(hex, 16, 64)
+func Hex2Bin(hexStr string) (string, error) {
+	bytes, err := hex.DecodeString(hexStr)
 	if err != nil {
 		return "", err
 	}
-	return fmt.Sprintf("%016b", ui), nil
+	return string(bytes), nil
 }

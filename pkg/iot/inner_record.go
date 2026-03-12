@@ -2,6 +2,7 @@ package iot
 
 import (
 	"darbelis.eu/iot/pkg/util"
+	"encoding/hex"
 	"strings"
 )
 
@@ -10,6 +11,10 @@ type InnerRecord struct {
 	Byte2Elements map[int]int
 	Byte4Elements map[int]int
 	Byte8Elements map[int]string
+	byte1Order    []int
+	byte2Order    []int
+	byte4Order    []int
+	byte8Order    []int
 }
 
 func NewInnerRecord() *InnerRecord {
@@ -31,7 +36,8 @@ func (rec *InnerRecord) CreateHex() string {
 func (rec *InnerRecord) encodeByte1Elements() string {
 	parts := []string{}
 
-	for k, v := range rec.Byte1Elements {
+	for _, k := range rec.byte1Order {
+		v := rec.Byte1Elements[k]
 		keyHex := util.StrPadLeft(util.Dechex(int64(k)), 4, "0")
 		valueHex := util.StrPadLeft(util.Dechex(int64(v)&0xFF), 2, "0")
 
@@ -44,7 +50,8 @@ func (rec *InnerRecord) encodeByte1Elements() string {
 func (rec *InnerRecord) encodeByte2Elements() string {
 	parts := []string{}
 
-	for k, v := range rec.Byte2Elements {
+	for _, k := range rec.byte2Order {
+		v := rec.Byte2Elements[k]
 		keyHex := util.StrPadLeft(util.Dechex(int64(k)), 4, "0")
 		valueHex := util.StrPadLeft(util.Dechex(int64(v)&0xFFFF), 4, "0")
 
@@ -57,7 +64,8 @@ func (rec *InnerRecord) encodeByte2Elements() string {
 func (rec *InnerRecord) encodeByte4Elements() string {
 	parts := []string{}
 
-	for k, v := range rec.Byte4Elements {
+	for _, k := range rec.byte4Order {
+		v := rec.Byte4Elements[k]
 		keyHex := util.StrPadLeft(util.Dechex(int64(k)), 4, "0")
 		valueHex := util.StrPadLeft(util.Dechex(int64(v)&0xFFFFFFFF), 8, "0")
 
@@ -69,34 +77,50 @@ func (rec *InnerRecord) encodeByte4Elements() string {
 
 func (rec *InnerRecord) encodeByte8Elements() string {
 	parts := []string{}
-	for id, value := range rec.Byte8Elements {
+	for _, id := range rec.byte8Order {
+		value := rec.Byte8Elements[id]
 		idHex := util.StrPadLeft(util.Dechex(int64(id)), 4, "0")
-		valHex, _ := util.Bin2hex(util.StrPadLeft(value[0:8], 8, "\x00"))
-		parts = append(parts, idHex, strings.ToLower(valHex))
+		// Right-pad with null bytes to 8 bytes, then take first 8
+		padded := make([]byte, 8)
+		copy(padded, []byte(value))
+		valHex := hex.EncodeToString(padded)
+		parts = append(parts, idHex, valHex)
 	}
 
 	return util.NumberHex(len(rec.Byte8Elements)) + strings.Join(parts, "")
 }
 
 func (rec *InnerRecord) set1(id int, value int) *InnerRecord {
+	if _, exists := rec.Byte1Elements[id]; !exists {
+		rec.byte1Order = append(rec.byte1Order, id)
+	}
 	rec.Byte1Elements[id] = value
 
 	return rec
 }
 
 func (rec *InnerRecord) set2(id int, value int) *InnerRecord {
+	if _, exists := rec.Byte2Elements[id]; !exists {
+		rec.byte2Order = append(rec.byte2Order, id)
+	}
 	rec.Byte2Elements[id] = value
 
 	return rec
 }
 
 func (rec *InnerRecord) set4(id int, value int) *InnerRecord {
+	if _, exists := rec.Byte4Elements[id]; !exists {
+		rec.byte4Order = append(rec.byte4Order, id)
+	}
 	rec.Byte4Elements[id] = value
 
 	return rec
 }
 
 func (rec *InnerRecord) set8(id int, value string) *InnerRecord {
+	if _, exists := rec.Byte8Elements[id]; !exists {
+		rec.byte8Order = append(rec.byte8Order, id)
+	}
 	rec.Byte8Elements[id] = value
 
 	return rec

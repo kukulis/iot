@@ -21,7 +21,7 @@ func CreateHex(mainRecord *MainRecord, innerRecord *InnerRecord) string {
 
 func (packet *Packet) CreateFullHex() string {
 	recordCount := len(packet.Inners)
-	recordCountHex := util.NumberHex(recordCount)
+	recordCountHex := util.StrPadLeft(util.Dechex(int64(recordCount)), 2, "0")
 
 	allRecordsDatas := []string{}
 
