@@ -38,7 +38,7 @@ func (rec *InnerRecord) encodeByte1Elements() string {
 		parts = append(parts, keyHex, valueHex)
 	}
 
-	return numberHex(len(rec.Byte1Elements)) + strings.Join(parts, "")
+	return util.NumberHex(len(rec.Byte1Elements)) + strings.Join(parts, "")
 }
 
 func (rec *InnerRecord) encodeByte2Elements() string {
@@ -51,7 +51,7 @@ func (rec *InnerRecord) encodeByte2Elements() string {
 		parts = append(parts, keyHex, valueHex)
 	}
 
-	return numberHex(len(rec.Byte2Elements)) + strings.Join(parts, "")
+	return util.NumberHex(len(rec.Byte2Elements)) + strings.Join(parts, "")
 }
 
 func (rec *InnerRecord) encodeByte4Elements() string {
@@ -64,7 +64,7 @@ func (rec *InnerRecord) encodeByte4Elements() string {
 		parts = append(parts, keyHex, valueHex)
 	}
 
-	return numberHex(len(rec.Byte4Elements)) + strings.Join(parts, "")
+	return util.NumberHex(len(rec.Byte4Elements)) + strings.Join(parts, "")
 }
 
 func (rec *InnerRecord) encodeByte8Elements() string {
@@ -75,11 +75,7 @@ func (rec *InnerRecord) encodeByte8Elements() string {
 		parts = append(parts, idHex, strings.ToLower(valHex))
 	}
 
-	return numberHex(len(rec.Byte8Elements)) + strings.Join(parts, "")
-}
-
-func numberHex(number int) string {
-	return util.StrPadLeft(util.Dechex(int64(number)), 4, "0")
+	return util.NumberHex(len(rec.Byte8Elements)) + strings.Join(parts, "")
 }
 
 func (rec *InnerRecord) set1(id int, value int) *InnerRecord {
